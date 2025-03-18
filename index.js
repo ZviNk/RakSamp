@@ -24,7 +24,7 @@ function startServer(server) {
 
     // Запускаем Wine с нужным DISPLAY
     const wine = spawn("wine", ["raksamp/arizona.exe", "-project", "1", "-server", server.server_id], {
-        env: { ...process.env, DISPLAY: ":99" }
+        env: { ...process.env, DISPLAY: ":0" }
     });
 
     // Далее логи и остальные обработчики...
