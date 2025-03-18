@@ -1,6 +1,6 @@
 FROM node:22.9.0-bookworm
 
-# Установка зависимостей (включая Wine и Xvfb)
+# Установка зависимостей (Wine, Xvfb и прочее)
 RUN dpkg --add-architecture i386 && \
     apt-get update && \
     apt-get install -y \
@@ -29,8 +29,9 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # Создание директории для логов
 RUN mkdir -p /home/crow/RakSamp/Arizona/logs
 
-# Устанавливаем переменную окружения DISPLAY для Xvfb
-ENV DISPLAY=:99
+# Инициализация Wine и отключение автозапуска explorer.exe (NoDesktop)
+RUN wineboot --init || true
+RUN wine reg add "HKCU\\Software\\Wine\\Explorer" /v NoDesktop /t REG_SZ /d 1 /f || true
 
 WORKDIR /usr/src/app
 
@@ -38,8 +39,8 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
 
-# Копирование остальных файлов приложения
+# Копирование оставшихся файлов приложения
 COPY . .
 
-# Запуск Xvfb в фоне и затем Node.js приложения
+# Запуск Xvfb в фоне (на дисплее :99) и затем Node.js приложения
 CMD ["sh", "-c", "Xvfb :99 -screen 0 1024x768x16 & node index.js"]
