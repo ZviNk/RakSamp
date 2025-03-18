@@ -9,10 +9,7 @@ RUN dpkg --add-architecture i386 && \
         wget \
         gnupg2 \
         libgl1-mesa-glx \
-        libgl1-mesa-dri \
         libx11-6 \
-        xvfb \
-        xauth \
         libnss3 \
         libasound2 \
         wine \
@@ -31,14 +28,12 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # Создание логов директории
 RUN mkdir -p /home/crow/RakSamp/Arizona/logs
 
-# Запуск Xvfb и инициализация wine
-RUN Xvfb :99 -screen 0 1024x768x16 & \
-    export DISPLAY=:99 && \
-    sleep 2 && \
-    wineboot --init || true
+# Установка переменной окружения DISPLAY для работы с Wine без графики
+ENV DISPLAY=:0
 
-# Устанавливаем переменную окружения для DISPLAY
-ENV DISPLAY=:99
+# Запуск wine в безголовом режиме (без зависимости от X-сервера)
+RUN winecfg || true
+RUN wineboot --init || true
 
 WORKDIR /usr/src/app
 
