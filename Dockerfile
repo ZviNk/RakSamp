@@ -14,6 +14,7 @@ RUN dpkg --add-architecture i386 && \
         xauth \
         libnss3 \
         libasound2 \
+        xserver-xorg-video-dummy \
         wine \
         wine32 \
         wine64 \
