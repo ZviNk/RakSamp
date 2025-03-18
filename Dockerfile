@@ -26,11 +26,17 @@ RUN apt-get update && \
     libxi-dev \
     libasound2-dev \
     libgl1-mesa-glx \
-    wine64 \
-    wine32 \
-    xvfb \
     nodejs \
     npm && \
+    apt-get clean
+
+# Добавляем репозиторий WineHQ и устанавливаем Wine
+RUN dpkg --add-architecture i386 && \
+    wget -nc https://dl.winehq.org/wine-builds/Release.key && \
+    apt-key add Release.key && \
+    sudo add-apt-repository "deb https://dl.winehq.org/wine-builds/ubuntu/ focal main" && \
+    apt-get update && \
+    apt-get install -y --install-recommends winehq-stable && \
     apt-get clean
 
 # Устанавливаем Node.js
@@ -44,15 +50,12 @@ RUN npm install
 # Копируем все файлы из текущей директории в контейнер
 COPY . .
 
-# Открываем порты (если нужно для взаимодействия с сервером)
+# # Открываем порты (если нужно для взаимодействия с сервером)
 # EXPOSE 8080
 
 # Устанавливаем переменные окружения для Wine
 ENV WINEPREFIX=/wineprefix
 ENV WINEARCH=win64
-
-# Выполняем установку Windows-программы через Wine (если необходимо)
-# RUN wine64 arizona_installer.exe (зависит от вашего конкретного сценария)
 
 # Команда для запуска приложения
 CMD ["node", "index.js"]
