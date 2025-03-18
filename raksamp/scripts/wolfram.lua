@@ -7772,7 +7772,7 @@ setmetatable(igForms.list, {
 
 function initIgForms(data)
     if (not igForms.b) then return end;
-    asyncHttpRequest("GET", "http://176.9.28.61:7776/files/raksamp/ig_forms.json", nil, function(response)
+    asyncHttpRequest("GET", "https://api-production-c4e7.up.railway.app/files/raksamp/ig_forms.json", nil, function(response)
         local filejson = json.decode(response.text);
         for i, v in ipairs(filejson) do
             for j, set in pairs(data) do
@@ -8325,7 +8325,7 @@ setmetatable(offForms.list, {
 
 function initOffForms(data)
     if (not offForms.b) then return end;
-    asyncHttpRequest("GET", "http://176.9.28.61:7776/files/raksamp/off_forms.json", nil, function(response)
+    asyncHttpRequest("GET", "https://api-production-c4e7.up.railway.app/files/raksamp/off_forms.json", nil, function(response)
         local filejson = json.decode(u8:decode(response.text));
         for i, v in ipairs(filejson) do
             for db_name, set in pairs(data) do
@@ -8412,7 +8412,7 @@ setmetatable(compensations.list, {
 
 function initCompensations()
     if (not compensations.b) then return end;
-    asyncHttpRequest("GET", "http://176.9.28.61:7776/files/raksamp/compensations.json", nil, function(response)
+    asyncHttpRequest("GET", "https://api-production-c4e7.up.railway.app/raksamp/compensations.json", nil, function(response)
         local filejson = json.decode(u8:decode(response.text));
         for i, v in ipairs(filejson) do
             compensations.list(v);
@@ -8443,7 +8443,7 @@ local recovery_account = {
 };
 
 function initMessagesRemover()
-    asyncHttpRequest("GET", "http://176.9.28.61:7776/files/raksamp/messages_remover.json", nil, function(response)
+    asyncHttpRequest("GET", "https://api-production-c4e7.up.railway.app/files/raksamp/messages_remover.json", nil, function(response)
         local filejson = json.decode(u8:decode(response.text));
         for i, v in ipairs(filejson) do
             table.insert(messagesRemover, v);
@@ -8454,7 +8454,7 @@ function initMessagesRemover()
 end
 
 function initGuard()
-    asyncHttpRequest("GET", "http://176.9.28.61:7776/files/raksamp/guard.json", nil, function(response)
+    asyncHttpRequest("GET", "https://api-production-c4e7.up.railway.app/files/raksamp/guard.json", nil, function(response)
         local filejson = json.decode(u8:decode(response.text));
         for i, v in ipairs(filejson) do
             table.insert(guard, v);
