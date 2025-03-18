@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 local PATH = "/home/crow/RakSamp/Arizona";
 local server_time = 3 * 60 * 60;
 
@@ -7771,7 +7772,7 @@ setmetatable(igForms.list, {
 
 function initIgForms(data)
     if (not igForms.b) then return end;
-    asyncHttpRequest("GET", "http://api-production-c4e7.up.railway.app/files/raksamp/ig_forms.json", nil, function(response)
+    asyncHttpRequest("GET", "http://176.9.28.61:7776/files/raksamp/ig_forms.json", nil, function(response)
         local filejson = json.decode(response.text);
         for i, v in ipairs(filejson) do
             for j, set in pairs(data) do
@@ -8324,7 +8325,7 @@ setmetatable(offForms.list, {
 
 function initOffForms(data)
     if (not offForms.b) then return end;
-    asyncHttpRequest("GET", "http://api-production-c4e7.up.railway.app/files/raksamp/off_forms.json", nil, function(response)
+    asyncHttpRequest("GET", "http://176.9.28.61:7776/files/raksamp/off_forms.json", nil, function(response)
         local filejson = json.decode(u8:decode(response.text));
         for i, v in ipairs(filejson) do
             for db_name, set in pairs(data) do
@@ -8411,7 +8412,7 @@ setmetatable(compensations.list, {
 
 function initCompensations()
     if (not compensations.b) then return end;
-    asyncHttpRequest("GET", "http://api-production-c4e7.up.railway.app/files/raksamp/compensations.json", nil, function(response)
+    asyncHttpRequest("GET", "http://176.9.28.61:7776/files/raksamp/compensations.json", nil, function(response)
         local filejson = json.decode(u8:decode(response.text));
         for i, v in ipairs(filejson) do
             compensations.list(v);
@@ -8442,7 +8443,7 @@ local recovery_account = {
 };
 
 function initMessagesRemover()
-    asyncHttpRequest("GET", "http://api-production-c4e7.up.railway.app/files/raksamp/messages_remover.json", nil, function(response)
+    asyncHttpRequest("GET", "http://176.9.28.61:7776/files/raksamp/messages_remover.json", nil, function(response)
         local filejson = json.decode(u8:decode(response.text));
         for i, v in ipairs(filejson) do
             table.insert(messagesRemover, v);
@@ -8453,7 +8454,7 @@ function initMessagesRemover()
 end
 
 function initGuard()
-    asyncHttpRequest("GET", "http://api-production-c4e7.up.railway.app/files/raksamp/guard.json", nil, function(response)
+    asyncHttpRequest("GET", "http://176.9.28.61:7776/files/raksamp/guard.json", nil, function(response)
         local filejson = json.decode(u8:decode(response.text));
         for i, v in ipairs(filejson) do
             table.insert(guard, v);
@@ -9264,7 +9265,7 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
         sendDialogResponse(dialogId, 1, 0, "");
     end
 
-    if (dialogId == 26518) then
+    if (dialogId == 26520) then
         local count = 0;
 
         if (check.props == "props") then
@@ -9299,7 +9300,7 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
         end
     end
 
-    if (dialogId == 26519) then
+    if (dialogId == 26521) then
         if (type(check.props) == "table") then
             local propsType, id = text:match("Имущество:%s*(%S+) №(%d+)");
 
@@ -9334,7 +9335,7 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
         end
     end
 
-    if (dialogId == 26520) then
+    if (dialogId == 26522) then
         if (type(check.props) == "table") then
             local propsType, id = text:match("Имущество:%s*(%S+) №(%d+)");
 
@@ -9364,7 +9365,7 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
         end
     end
 
-    if (dialogId == 26521) then
+    if (dialogId == 26523) then
         if (type(check.props) == "table") then
             local propsType, id = text:match("Имущество:%s*(%S+) №(%d+)");
 
@@ -9394,7 +9395,7 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
         end
     end
 
-    if (dialogId == 26575) then
+    if (dialogId == 26577) then
         if (check.pledge == "pledge") then
             if (#pledge.pool == 0) then
                 for line in text:gmatch("[^\n]+") do
@@ -9443,7 +9444,7 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
         end
     end
 
-    if (dialogId == 26576) then
+    if (dialogId == 26578) then
         if (type(check.pledge) == "table") then
             local action;
 
@@ -9459,7 +9460,7 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
         end
     end
 
-    if (dialogId == 26579) then
+    if (dialogId == 26581) then
         local nick = text:match("Ник заблокированного: {E9967A}([%w_]+)");
         local admin = text:match("Кто заблокировал: {E9967A}([%w_]+)");
         local reason = text:match("Причина: {E9967A}([^\n]+)"):gsub("\\n", "");
@@ -9514,13 +9515,13 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
         end
     end
 
-    if (dialogId == 26765) then
+    if (dialogId == 26767) then
         if (check.morg == 'gps') then
             sendDialogResponse(dialogId, 1, 0, "%[ЧАСТНАЯ%]");
         end
     end
 
-    if (dialogId == 26774) then
+    if (dialogId == 26776) then
         if (check.morg == 'gps') then
             local count = 0;
 
@@ -9542,7 +9543,7 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
         end
     end
 
-    if (dialogId == 27083) then
+    if (dialogId == 27085) then
         if (check.mpdonate) then
             local action = findListInDialog(text, style, "Фонд мероприятий");
 
@@ -9582,7 +9583,7 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
         end
     end
 
-    if (dialogId == 27143) then
+    if (dialogId == 27145) then
         local list = findListInDialog(text, style, "Спавн Транспорта");
 
         if (check.spawncars) then
@@ -9592,7 +9593,7 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
         end
     end
 
-    if (dialogId == 27150) then
+    if (dialogId == 27152) then
         if (check.offForms) then
             if (check.offForms.form == "makejudge") then
                 local action = findListInDialog(text, style, check.offForms.nickname);
@@ -9677,25 +9678,25 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
         end
     end
 
-    if (dialogId == 27151) then
+    if (dialogId == 27153) then
         if (check.offForms.form == "makejudge") then
             sendDialogResponse(dialogId, 1, 0, check.offForms.nickname);
         end
     end
 
-    if (dialogId == 27152) then
+    if (dialogId == 27154) then
         if (check.offForms.form == "makejudge") then
             sendDialogResponse(dialogId, 1, 0, "");
         end
     end
 
-    if (dialogId == 27153) then
+    if (dialogId == 27155) then
         if (check.offForms.form == "unjudge") then
             sendDialogResponse(dialogId, 1, 0, "");
         end
     end
 
-    if (dialogId == 27228) then
+    if (dialogId == 27230) then
         local build = text:match("Build: (.+)");
 
         if (build) then
@@ -9703,7 +9704,7 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
         end
     end
 
-    if (dialogId == 27277) then
+    if (dialogId == 27279) then
         if (check.mpdonate) then
             local action = findListInDialog(text, style, "Прорекламировать фонд");
 
@@ -9713,7 +9714,7 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
         end
     end
 
-    if (dialogId == 27287) then
+    if (dialogId == 27289) then
         if (check.mpdonate) then
             check.mpdonate = nil;
 
