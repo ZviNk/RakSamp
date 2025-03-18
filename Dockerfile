@@ -28,10 +28,6 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN mkdir -p /home/crow/RakSamp/Arizona/logs
 
-RUN Xvfb :99 -screen 0 1024x768x16 & \
-    sleep 2 && \
-    env DISPLAY=:99 wineboot --init || true
-
 ENV DISPLAY=:99
 
 WORKDIR /usr/src/app
