@@ -4,6 +4,7 @@ RUN apt-get update && apt-get install -y tzdata
 RUN dpkg --add-architecture i386 && \
     apt-get update && \
     apt-get install -y wine32 && \
+    apt-get install xvfb && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
