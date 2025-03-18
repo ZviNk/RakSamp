@@ -1,44 +1,58 @@
-FROM node:22.9.0-bookworm
+# Используем официальный образ Ubuntu как базовый
+FROM ubuntu:20.04
 
-# Чтобы apt-get install не ждал ввода
+# Устанавливаем рабочую директорию
+WORKDIR /app
+
+# Устанавливаем переменные окружения для недавней версии Wine
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Добавляем i386-архитектуру и устанавливаем необходимые пакеты
-RUN dpkg --add-architecture i386 && \
-    apt-get update && \
+# Обновляем и устанавливаем необходимые пакеты
+RUN apt-get update && \
     apt-get install -y \
-        tzdata \
-        xvfb \
-        xauth \
-        libgl1-mesa-glx \
-        libgl1-mesa-dri \
-        libx11-6 \
-        libnss3 \
-        libasound2 \
-        wine \
-        wine32 \
-        libwine \
-        libwine:i386 \
-        fonts-wine && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    wget \
+    curl \
+    unzip \
+    software-properties-common \
+    apt-transport-https \
+    ca-certificates \
+    lsb-release \
+    sudo \
+    build-essential \
+    libx11-dev \
+    libxrandr-dev \
+    libxinerama-dev \
+    libxcursor-dev \
+    libxi-dev \
+    libasound2-dev \
+    libgl1-mesa-glx \
+    wine64 \
+    wine32 \
+    xvfb \
+    nodejs \
+    npm && \
+    apt-get clean
 
-# Задаём временную зону
-ENV TZ=Europe/Moscow
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+# Устанавливаем Node.js
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
+    apt-get install -y nodejs
 
-# Дополнительная инициализация wine
-RUN wineboot --init
-
-# Создаём рабочую директорию и устанавливаем пакет dbus-x11
-WORKDIR /usr/src/app
-
-# Копируем файлы зависимостей и устанавливаем node-модули
+# Копируем package.json и устанавливаем зависимости
 COPY package*.json ./
 RUN npm install
 
-# Копируем весь исходный код приложения
+# Копируем все файлы из текущей директории в контейнер
 COPY . .
 
-# Запускаем приложение
+# Открываем порты (если нужно для взаимодействия с сервером)
+# EXPOSE 8080
+
+# Устанавливаем переменные окружения для Wine
+ENV WINEPREFIX=/wineprefix
+ENV WINEARCH=win64
+
+# Выполняем установку Windows-программы через Wine (если необходимо)
+# RUN wine64 arizona_installer.exe (зависит от вашего конкретного сценария)
+
+# Команда для запуска приложения
 CMD ["node", "index.js"]
