@@ -20,22 +20,14 @@ async function main() {
 function startServer(server) {
     console.log(`Executing: wine raksamp/arizona.exe -project 1 -server ${server.server_id}`);
 
-    // Запускаем Xvfb
-    const xvfb = spawn("Xvfb", [":99", "-screen", "0", "1024x768x16"], { detached: true });
+    // Здесь убираем spawn("Xvfb", ...)
 
-    xvfb.on("error", (err) => {
-        console.error("Failed to start Xvfb:", err);
-    });
-
-    xvfb.on("close", (code) => {
-        console.log(`Xvfb exited with code ${code}`);
-    });
-
-    // Запускаем Wine с переменной окружения DISPLAY
+    // Запускаем Wine с нужным DISPLAY
     const wine = spawn("wine", ["raksamp/arizona.exe", "-project", "1", "-server", server.server_id], {
         env: { ...process.env, DISPLAY: ":99" }
     });
 
+    // Далее логи и остальные обработчики...
     wine.stdout.on("data", (data) => {
         console.log(`[STDOUT] ${data}`);
     });
