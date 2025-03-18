@@ -27,12 +27,6 @@ RUN dpkg --add-architecture i386 && \
 ENV TZ=Europe/Moscow
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# Удаляем старый wineprefix (если существует)
-RUN rm -rf /root/.wine
-
-# Инициализируем новый wineprefix с помощью winecfg (через xvfb-run для поддержки X)
-RUN xvfb-run winecfg
-
 # Дополнительная инициализация wine
 RUN wineboot --init
 
