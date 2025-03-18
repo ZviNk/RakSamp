@@ -20,27 +20,35 @@ async function main() {
 function startServer(server) {
     console.log(`Executing: wine raksamp/arizona.exe -project 1 -server ${server.server_id}`);
 
-    // Здесь убираем spawn("Xvfb", ...)
+    // Запускаем Xvfb
+    const xvfb = spawn("Xvfb", [":99", "-screen", "0", "1024x768x16"], { detached: true });
 
-    // Запускаем Wine с нужным DISPLAY
-    const wine = spawn("wine", ["raksamp/arizona.exe", "-project", "1", "-server", server.server_id], {
-        env: { ...process.env, DISPLAY: ":0" }
+    xvfb.on("error", (err) => {
+        console.error("Failed to start Xvfb:", err);
     });
 
-    // Далее логи и остальные обработчики...
-    wine.stdout.on("data", (data) => {
+    xvfb.on("close", (code) => {
+        console.log(`Xvfb exited with code ${code}`);
+    });
+
+    // Запускаем Wine с переменной окружения DISPLAY
+    const process = spawn("wine", ["raksamp/arizona.exe", "-project", "1", "-server", server.server_id], {
+        env: { ...process.env, DISPLAY: ":99" }
+    });
+
+    process.stdout.on("data", (data) => {
         console.log(`[STDOUT] ${data}`);
     });
 
-    wine.stderr.on("data", (data) => {
+    process.stderr.on("data", (data) => {
         console.error(`[STDERR] ${data}`);
     });
 
-    wine.on("close", (code) => {
+    process.on("close", (code) => {
         console.log(`[ RakSamp ] Server ${server.server_id} exited with code ${code}`);
     });
 
-    wine.on("error", (err) => {
+    process.on("error", (err) => {
         console.error("Failed to start process:", err);
     });
 }
