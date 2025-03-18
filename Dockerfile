@@ -35,7 +35,7 @@ RUN wine reg add "HKCU\\Software\\Wine\\Explorer" /v NoDesktop /t REG_SZ /d 1 /f
 
 # Устанавливаем переменные окружения для Wine
 ENV DISPLAY=:99
-ENV WINEDEBUG=-ole
+ENV WINEDEBUG=-fixme
 
 WORKDIR /usr/src/app
 
