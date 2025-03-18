@@ -32,15 +32,22 @@ function startServer(server) {
     // });
 
     // Запускаем Wine с переменной окружения DISPLAY
+    const pathToExe = resolve("raksamp/arizona.exe");
+
     const wine = spawn("xvfb-run", [
       "-a",
       "wine",
       "start",
-      "/desktop=MyDesktop,1024x768",
-      "raksamp/arizona.exe",
-      "-project", "1",
-      "-server", server.server_id
-    ], { env: { ...process.env }, cwd: "/usr/src/app" });
+      "/unix",
+      pathToExe,
+      "-project",
+      "1",
+      "-server",
+      server.server_id
+    ], {
+      env: { ...process.env },
+      cwd: "/usr/src/app" // убеждаемся, что рабочая директория правильная
+    });
 
     wine.stdout.on("data", (data) => {
         console.log(`[STDOUT] ${data}`);
