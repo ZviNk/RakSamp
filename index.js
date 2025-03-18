@@ -20,7 +20,7 @@ async function main() {
 function startServer(server) {
     console.log(`Executing: wine raksamp/arizona.exe -project 1 -server ${server.server_id}`);
 
-    // Запускаем Wine с использованием Xvfb (DISPLAY=:99)
+    // Запускаем Wine с использованием виртуального дисплея Xvfb (DISPLAY=:99)
     const wine = spawn("wine", ["raksamp/arizona.exe", "-project", "1", "-server", server.server_id], {
         env: { ...process.env, DISPLAY: ":99" }
     });
