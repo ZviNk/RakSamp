@@ -17,6 +17,9 @@ RUN dpkg --add-architecture i386 && \
         wine \
         wine32 \
         wine64 \
+        # winetricks corefonts \
+        # winetricks gdiplus \
+        # winetricks dotnet462 \
         libwine \
         libwine:i386 \
         fonts-wine && \
@@ -27,6 +30,7 @@ ENV TZ=Europe/Moscow
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN mkdir -p /home/crow/RakSamp/Arizona/logs
+RUN wineboot --init
 
 ENV DISPLAY=:99
 
