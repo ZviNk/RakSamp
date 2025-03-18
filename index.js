@@ -35,19 +35,23 @@ function startServer(server) {
     const pathToExe = resolve("raksamp/arizona.exe");
 
     const wine = spawn("xvfb-run", [
-      "-a",
-      "wine",
-      "start",
-      "/unix",
-      pathToExe,
-      "-project",
-      "1",
-      "-server",
-      server.server_id
+        "-a",
+        "-s", 
+        "-screen 0 1024x768x24",
+        "wine",
+        pathToExe,
+        "-project",
+        "1",
+        "-server",
+        server.server_id
     ], {
-      env: { ...process.env },
-      cwd: "/usr/src/app" // убеждаемся, что рабочая директория правильная
+        env: { 
+            ...process.env,
+            WINEDLLOVERRIDES: "explorer.exe=d" // отключаем запуск explorer
+        },
+        cwd: "/usr/src/app" // рабочая директория, где находится arizona.exe
     });
+
 
     wine.stdout.on("data", (data) => {
         console.log(`[STDOUT] ${data}`);
