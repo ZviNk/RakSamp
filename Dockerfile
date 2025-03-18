@@ -25,13 +25,12 @@ RUN dpkg --add-architecture i386 && \
 ENV TZ=Europe/Moscow
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# Создание логов директории
+# Создание директории для логов
 RUN mkdir -p /home/crow/RakSamp/Arizona/logs
 
-# Установка переменной окружения DISPLAY для работы с Wine без графики
-ENV DISPLAY=:0
+# (Удаляем переменную DISPLAY, так как она не требуется)
 
-# Запуск wine в безголовом режиме (без зависимости от X-сервера)
+# Инициализация Wine (если не требуется, можно убрать winecfg)
 RUN winecfg || true
 RUN wineboot --init || true
 
@@ -41,7 +40,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
 
-# Копирование оставшихся файлов
+# Копирование остальных файлов
 COPY . .
 
 # Запуск Node.js приложения
