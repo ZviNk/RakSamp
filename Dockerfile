@@ -45,6 +45,6 @@ RUN xvfb-run -a wineboot --init || true
 # 2) В самом контейнере (в runtime) выставляем DISPLAY=:99
 #    и стартуем Xvfb + node-приложение
 #
-ENV DISPLAY=:99
+ENV DISPLAY=:0
 
-CMD Xvfb :99 -screen 0 1024x768x16 & node index.js
+CMD Xvfb :0 -screen 0 1024x768x16 & node index.js
