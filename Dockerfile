@@ -27,24 +27,22 @@ RUN dpkg --add-architecture i386 && \
 ENV TZ=Europe/Moscow
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-WORKDIR /usr/src/app
+# Создаем непользователь root, например "app"
+RUN useradd -ms /bin/bash app
 
-COPY package*.json ./
+# Переключаемся на пользователя "app"
+USER app
+WORKDIR /home/app
+
+# Копируем файлы и устанавливаем зависимости с корректными правами
+COPY --chown=app:app package*.json ./
 RUN npm install
+COPY --chown=app:app . .
 
-COPY . .
-
-# 
-# 1) Инициализируем Wine-префикс ещё во время сборки
-#    (запускаем wineboot внутри виртуального X, чтобы Wine не
-#    ругался на отсутствие дисплея).
-#
+# Инициализируем Wine-префикс (он будет создан в /home/app/.wine)
 RUN xvfb-run -a wineboot --init || true
 
-#
-# 2) В самом контейнере (в runtime) выставляем DISPLAY=:99
-#    и стартуем Xvfb + node-приложение
-#
 ENV DISPLAY=:99
 
+# Запускаем Xvfb и node-приложение
 CMD Xvfb :99 -screen 0 1024x768x16 & node index.js
