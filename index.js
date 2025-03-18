@@ -32,9 +32,15 @@ function startServer(server) {
     });
 
     // Запускаем Wine с переменной окружения DISPLAY
-    const wine = spawn("xvfb-run", ["-a", "wine", "raksamp/arizona.exe", "-project", "1", "-server", server.server_id], {
-        env: { ...process.env, WINEDLLOVERRIDES: "explorer.exe=d" }
-    });    
+    const wine = spawn("xvfb-run", [
+      "-a",
+      "wine",
+      "start",
+      "/desktop=MyDesktop,1024x768",
+      "raksamp/arizona.exe",
+      "-project", "1",
+      "-server", server.server_id
+    ], { env: { ...process.env } }); 
 
     wine.stdout.on("data", (data) => {
         console.log(`[STDOUT] ${data}`);
