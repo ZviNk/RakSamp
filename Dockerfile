@@ -1,5 +1,6 @@
 FROM node:22.9.0-bookworm
 
+# Устанавливаем необходимые пакеты
 RUN dpkg --add-architecture i386 && \
     apt-get update && \
     apt-get install -y \
@@ -26,19 +27,16 @@ RUN dpkg --add-architecture i386 && \
 ENV TZ=Europe/Moscow
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN mkdir -p /home/crow/RakSamp/Arizona/logs
-
-RUN Xvfb :99 -screen 0 1024x768x16 & \
-    sleep 2 && \
-    env DISPLAY=:99 wineboot --init || true
-
-ENV DISPLAY=:99
-
+# Рабочая директория
 WORKDIR /usr/src/app
 
+# Копируем package.json и package-lock.json, ставим зависимости
 COPY package*.json ./
 RUN npm install
 
+# Копируем остальные файлы (код)
 COPY . .
 
-CMD ["node", "index.js"]
+# Запускаем приложение через xvfb-run. 
+# --server-args позволяет вам задавать конфигурацию экрана.
+CMD ["xvfb-run", "--server-args=-screen 0 1024x768x16 -nolisten tcp", "node", "index.js"]
