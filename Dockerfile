@@ -27,10 +27,13 @@ RUN dpkg --add-architecture i386 && \
 
 RUN mkdir -p /logs
 
+# Исправленная команда: использование '&&' для правильного выполнения команд
 RUN Xvfb :99 -screen 0 1024x768x16 & \
+    sleep 5 && \
     env DISPLAY=:99 wineboot --init && \
     sleep 5 && \
-    wineserver -k
+    wineserver -k && \
+    wait
 
 WORKDIR /usr/src/app
 
