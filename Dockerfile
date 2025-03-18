@@ -18,8 +18,6 @@ RUN dpkg --add-architecture i386 && \
         wine32 \
         wine64 \
         winbind \
-        wine-gecko \
-        wine-mono \
         libwine \
         libwine:i386 \
         fonts-wine && \
