@@ -18,10 +18,11 @@ async function main() {
 }
 
 function startServer(server) {
-    console.log(`Executing: wineconsole --backend=tty raksamp/arizona.exe -project 1 -server ${server.server_id}`);
+    console.log(`Executing: wine raksamp/arizona.exe -project 1 -server ${server.server_id}`);
 
-    const wine = spawn("wineconsole", ["--backend=tty", "raksamp/arizona.exe", "-project", "1", "-server", server.server_id], {
-        env: process.env
+    // Запускаем Wine с использованием Xvfb (DISPLAY=:99)
+    const wine = spawn("wine", ["raksamp/arizona.exe", "-project", "1", "-server", server.server_id], {
+        env: { ...process.env, DISPLAY: ":99" }
     });
 
     wine.stdout.on("data", (data) => {
@@ -40,7 +41,6 @@ function startServer(server) {
         console.error("Failed to start process:", err);
     });
 }
-
 
 async function checkTasks() {
     const tasks = await db(`SELECT * FROM \`arizona\`.tasks_system WHERE \`passed\` = false;`);
