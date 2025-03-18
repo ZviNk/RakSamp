@@ -1,9 +1,8 @@
-/* IMPORTING LIBRARIES: */
-require('dotenv').config(); /* FOR USING .env AS CONFIG */
-const {exec} = require('node:child_process');
-const {db} = require("./db");
-const {readdirSync, unlinkSync, existsSync, mkdirSync} = require("fs");
-const {join, resolve} = require("path");
+require('dotenv').config();
+const { spawn } = require('child_process');
+const { db } = require("./db");
+const { readdirSync, unlinkSync, existsSync, mkdirSync } = require("fs");
+const { join, resolve } = require("path");
 
 main();
 setInterval(checkTasks, 5000);
@@ -14,18 +13,30 @@ async function main() {
 
     for (const server of servers) {
         await createLogs(server.server_id);
-        console.log(`Executing: wine raksamp/arizona.exe -project 1 -server ${server.server_id}`);
-
-        try {
-            const { stdout, stderr } = await exec(`wine raksamp/arizona.exe -project 1 -server ${server.server_id}`);
-            console.log("Command executed successfully.");
-            console.log("stdout:", stdout);
-            console.error("stderr:", stderr);
-        } catch (error) {
-            console.error("Error executing command:", error);
-        }
-        console.log(`[ RakSamp ] Started ${server.server_name} [IP: ${server.server_ip} | PORT: ${server.server_port}].`);
+        startServer(server);
     }
+}
+
+function startServer(server) {
+    console.log(`Executing: wine raksamp/arizona.exe -project 1 -server ${server.server_id}`);
+
+    const process = spawn("wine", ["raksamp/arizona.exe", "-project", "1", "-server", server.server_id]);
+
+    process.stdout.on("data", (data) => {
+        console.log(`[STDOUT] ${data}`);
+    });
+
+    process.stderr.on("data", (data) => {
+        console.error(`[STDERR] ${data}`);
+    });
+
+    process.on("close", (code) => {
+        console.log(`[ RakSamp ] Server ${server.server_id} exited with code ${code}`);
+    });
+
+    process.on("error", (err) => {
+        console.error("Failed to start process:", err);
+    });
 }
 
 async function checkTasks() {
@@ -35,8 +46,6 @@ async function checkTasks() {
         const data = await db(`SELECT * FROM \`arizona\`.servers_raksamp WHERE \`server_id\` = ${task.server_id};`);
         const server = data[0];
         const time_created = new Date(task.time_created + ' UTC');
-        const time_half_passed = new Date(task.time_half_passed + ' UTC');
-        const time_passed = new Date(task.time_passed + ' UTC');
 
         if (!server.active) {
             await db(`UPDATE \`arizona\`.tasks_system SET \`error\` = true, \`text_error\` = "Система отключена на данном сервере." WHERE \`server_id\` = ${task.server_id};`);
@@ -46,35 +55,20 @@ async function checkTasks() {
         switch (task.task) {
             case 'restart':
                 if (new Date() - time_created >= 10000) {
-                    await db(`UPDATE \`arizona\`.tasks_system SET \`error\` = true, \`text_error\` = "Сервер выключен.", \`half_passed\` = true, \`time_half_passed\` = DEFAULT, \`passed\` = true, \`time_passed\` = DEFAULT WHERE \`server_id\` = ${server.server_id} AND \`task_id\` = ${task.task_id};`);
+                    await db(`UPDATE \`arizona\`.tasks_system SET \`error\` = true, \`text_error\` = "Сервер выключен.", \`passed\` = true WHERE \`server_id\` = ${server.server_id};`);
                     break;
                 }
-                if (!task.half_passed) break;
-
-                await db(`UPDATE \`arizona\`.tasks_system SET \`passed\` = true WHERE \`server_id\` = ${server.server_id};`);
-                await exec(`wine raksamp/arizona.exe -project 1 -server ${server.server_id}`);
-                console.log(`[ RakSamp ] Restarted ${server.server_name} [IP: ${server.server_ip} | PORT: ${server.server_port}].`);
+                startServer(server);
                 break;
             case 'start':
-                if (server.started) {
-                    await db(`UPDATE \`arizona\`.tasks_system SET \`error\` = true, \`text_error\` = "Сервер уже запущен.", \`half_passed\` = true, \`time_half_passed\` = DEFAULT, \`passed\` = true, \`time_passed\` = DEFAULT WHERE \`server_id\` = ${server.server_id} AND \`task_id\` = ${task.task_id};`);
-                    break;
+                if (!server.started) {
+                    await db(`UPDATE \`arizona\`.servers_raksamp SET \`start\` = true WHERE \`server_id\` = ${server.server_id};`);
+                    startServer(server);
                 }
-
-                await db(`UPDATE \`arizona\`.servers_raksamp SET \`start\` = true WHERE \`server_id\` = ${server.server_id};`);
-                await db(`UPDATE \`arizona\`.tasks_system SET \`half_passed\` = true, \`time_half_passed\` = DEFAULT, \`passed\` = true, \`time_passed\` = DEFAULT WHERE \`server_id\` = ${server.server_id};`);
-                await exec(`wine raksamp/arizona.exe -project 1 -server ${server.server_id}`);
-                console.log(`[ RakSamp ] Started ${server.server_name} [IP: ${server.server_ip} | PORT: ${server.server_port}].`);
                 break;
             case 'stop':
-                if (new Date() - time_created >= 10000) {
-                    await db(`UPDATE \`arizona\`.tasks_system SET \`error\` = true, \`text_error\` = "Сервер уже выключен.", \`half_passed\` = true, \`time_half_passed\` = DEFAULT, \`passed\` = true, \`time_passed\` = DEFAULT WHERE \`server_id\` = ${server.server_id} AND \`task_id\` = ${task.task_id};`);
-                    break;
-                }
-                if (!task.half_passed) break;
-
-                await db(`UPDATE \`arizona\`.tasks_system SET \`passed\` = true WHERE \`server_id\` = ${server.server_id};`);
-                console.log(`[ RakSamp ] Stopped ${server.server_name} [IP: ${server.server_ip} | PORT: ${server.server_port}].`);
+                console.log(`[ RakSamp ] Stopping ${server.server_name} [IP: ${server.server_ip} | PORT: ${server.server_port}].`);
+                break;
             default:
                 break;
         }
@@ -88,15 +82,15 @@ async function checkLogs() {
 
     for (const server of servers) {
         const serverLogsDir = join("./logs", server);
-        const logs = readdirSync(`./logs/${server}`);
+        const logs = readdirSync(serverLogsDir);
 
         for (const log of logs) {
             const logPath = join(serverLogsDir, log);
 
-            const match = log.match(/^(\d{2})\.(\d{2})\.(\d{4})\.log$/);
+            const match = log.match(/^\d{2}\.\d{2}\.\d{4}\.log$/);
             if (match) {
-                const [_, day, month, year] = match;
-                const logDate = new Date(`${year}-${month}-${day}`);
+                const [day, month, year] = log.split(".").map(Number);
+                const logDate = new Date(year, month - 1, day);
 
                 if (logDate < sixMonthsAgo) {
                     unlinkSync(logPath);
