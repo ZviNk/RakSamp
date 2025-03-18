@@ -1,6 +1,5 @@
 FROM node:22.9.0-bookworm
 
-# Подключаем i386-архитектуру и ставим нужные пакеты
 RUN dpkg --add-architecture i386 && \
     apt-get update && \
     apt-get install -y \
@@ -24,22 +23,27 @@ RUN dpkg --add-architecture i386 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Устанавливаем часовой пояс
 ENV TZ=Europe/Moscow
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# Говорим Wine (и другим приложениям), что X-сервер будет "на 99-ом дисплее"
-ENV DISPLAY=:99
-
 WORKDIR /usr/src/app
 
-# Устанавливаем зависимости node.js
 COPY package*.json ./
 RUN npm install
 
-# Копируем исходники
 COPY . .
 
-# В production-контейнере используем единый CMD,
-# где сначала запускаем Xvfb, а затем – node index.js
+# 
+# 1) Инициализируем Wine-префикс ещё во время сборки
+#    (запускаем wineboot внутри виртуального X, чтобы Wine не
+#    ругался на отсутствие дисплея).
+#
+RUN xvfb-run -a wineboot --init || true
+
+#
+# 2) В самом контейнере (в runtime) выставляем DISPLAY=:99
+#    и стартуем Xvfb + node-приложение
+#
+ENV DISPLAY=:99
+
 CMD Xvfb :99 -screen 0 1024x768x16 & node index.js
