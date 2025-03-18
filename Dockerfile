@@ -18,6 +18,9 @@ RUN dpkg --add-architecture i386 && \
         wine \
         wine32 \
         wine64 \
+        winetricks corefonts \
+        winetricks gdiplus \
+        winetricks dotnet462 \
         libwine \
         libwine:i386 \
         fonts-wine && \
