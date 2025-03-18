@@ -1,6 +1,6 @@
 FROM node:22.9.0-bookworm
 
-# Установка зависимостей
+# Установка зависимостей (включая Wine и Xvfb)
 RUN dpkg --add-architecture i386 && \
     apt-get update && \
     apt-get install -y \
@@ -17,7 +17,8 @@ RUN dpkg --add-architecture i386 && \
         wine64 \
         libwine \
         libwine:i386 \
-        fonts-wine && \
+        fonts-wine \
+        xvfb && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -28,11 +29,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # Создание директории для логов
 RUN mkdir -p /home/crow/RakSamp/Arizona/logs
 
-# (Удаляем переменную DISPLAY, так как она не требуется)
-
-# Инициализация Wine (если не требуется, можно убрать winecfg)
-RUN winecfg || true
-RUN wineboot --init || true
+# Устанавливаем переменную окружения DISPLAY для Xvfb
+ENV DISPLAY=:99
 
 WORKDIR /usr/src/app
 
@@ -40,8 +38,8 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
 
-# Копирование остальных файлов
+# Копирование остальных файлов приложения
 COPY . .
 
-# Запуск Node.js приложения
-CMD ["node", "index.js"]
+# Запуск Xvfb в фоне и затем Node.js приложения
+CMD ["sh", "-c", "Xvfb :99 -screen 0 1024x768x16 & node index.js"]
