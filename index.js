@@ -20,7 +20,7 @@ async function main() {
 function startServer(server) {
     console.log(`Executing: wine raksamp/arizona.exe -project 1 -server ${server.server_id}`);
 
-    // // Запускаем Xvfb
+    // Запускаем Xvfb
     // const xvfb = spawn("Xvfb", [":99", "-screen", "0", "1024x768x16"], { detached: true });
 
     // xvfb.on("error", (err) => {
@@ -32,26 +32,9 @@ function startServer(server) {
     // });
 
     // Запускаем Wine с переменной окружения DISPLAY
-    const pathToExe = resolve("raksamp/arizona.exe");
-
-    const wine = spawn("xvfb-run", [
-        "-a",
-        "-s", 
-        "-screen 0 1024x768x24",
-        "wine",
-        pathToExe,
-        "-project",
-        "1",
-        "-server",
-        server.server_id
-    ], {
-        env: { 
-            ...process.env,
-            WINEDLLOVERRIDES: "explorer.exe=d" // отключаем запуск explorer
-        },
-        cwd: "/usr/src/app" // рабочая директория, где находится arizona.exe
+    const wine = spawn("wine", ["raksamp/arizona.exe", "-project", "1", "-server", server.server_id], {
+        env: { ...process.env, DISPLAY: ":99" }
     });
-
 
     wine.stdout.on("data", (data) => {
         console.log(`[STDOUT] ${data}`);
