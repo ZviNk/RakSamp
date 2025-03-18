@@ -3,7 +3,7 @@ FROM node:22.9.0-bookworm
 # Чтобы apt-get install не ждал ввода
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Добавляем i386-архитектуру и ставим все нужные пакеты
+# Добавляем i386-архитектуру и устанавливаем необходимые пакеты
 RUN dpkg --add-architecture i386 && \
     apt-get update && \
     apt-get install -y \
@@ -28,19 +28,22 @@ RUN dpkg --add-architecture i386 && \
 ENV TZ=Europe/Moscow
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# Инициализируем wineprefix (важно делать до копирования и запуска)
+# Инициализируем wineprefix (важно делать до копирования и запуска приложения)
 RUN wineboot --init
 
-# Создадим рабочую директорию
+# Создаём рабочую директорию и устанавливаем дополнительные пакеты
 WORKDIR /usr/src/app
-RUN apt-get update && apt-get install -y dbus-x11
+RUN apt-get update && \
+    apt-get install -y dbus-x11 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Устанавливаем зависимости
+# Копируем файлы зависимостей и устанавливаем node-модули
 COPY package*.json ./
 RUN npm install
 
-# Копируем весь код
+# Копируем весь исходный код приложения
 COPY . .
 
-# Запускаем через xvfb-run
+# Запускаем приложение
 CMD ["node", "index.js"]
