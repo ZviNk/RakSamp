@@ -30,13 +30,19 @@ RUN apt-get update && \
     npm && \
     apt-get clean
 
-# Добавляем репозиторий WineHQ и устанавливаем Wine
-RUN dpkg --add-architecture i386 && \
-    wget -nc https://dl.winehq.org/wine-builds/Release.key && \
-    apt-key add Release.key && \
-    sudo add-apt-repository "deb https://dl.winehq.org/wine-builds/ubuntu/ focal main" && \
-    apt-get update && \
-    apt-get install -y --install-recommends winehq-stable && \
+# Добавляем архитектуру i386 для поддержки 32-битных приложений
+RUN dpkg --add-architecture i386
+
+# Добавляем репозиторий WineHQ и устанавливаем публичный ключ
+RUN wget -nc https://dl.winehq.org/wine-builds/Release.key && \
+    apt-key add Release.key
+
+# Добавляем репозиторий WineHQ в список источников
+RUN sudo add-apt-repository "deb https://dl.winehq.org/wine-builds/ubuntu/ focal main" && \
+    apt-get update
+
+# Устанавливаем Wine
+RUN apt-get install -y --install-recommends winehq-stable && \
     apt-get clean
 
 # Устанавливаем Node.js
@@ -50,7 +56,7 @@ RUN npm install
 # Копируем все файлы из текущей директории в контейнер
 COPY . .
 
-# # Открываем порты (если нужно для взаимодействия с сервером)
+# Открываем порты (если нужно для взаимодействия с сервером)
 # EXPOSE 8080
 
 # Устанавливаем переменные окружения для Wine
