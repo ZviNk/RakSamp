@@ -1,67 +1,26 @@
-# Используем официальный образ Ubuntu как базовый
-FROM ubuntu:20.04
+# Используем официальный образ Node.js (например, Node 14)
+FROM node:14
 
-# Устанавливаем рабочую директорию
-WORKDIR /app
+# Добавляем архитектуру i386 и обновляем пакеты, устанавливаем wine, wine32 и Xvfb
+RUN dpkg --add-architecture i386 && \
+    apt-get update && \
+    apt-get install -y wine wine32 xvfb && \
+    rm -rf /var/lib/apt/lists/*
 
-# Устанавливаем переменные окружения для недавней версии Wine
-ENV DEBIAN_FRONTEND=noninteractive
+# Устанавливаем рабочую директорию внутри контейнера
+WORKDIR /usr/src/app
 
-# Обновляем и устанавливаем необходимые пакеты
-RUN apt-get update && \
-    apt-get install -y \
-    wget \
-    curl \
-    unzip \
-    software-properties-common \
-    apt-transport-https \
-    ca-certificates \
-    lsb-release \
-    sudo \
-    build-essential \
-    libx11-dev \
-    libxrandr-dev \
-    libxinerama-dev \
-    libxcursor-dev \
-    libxi-dev \
-    libasound2-dev \
-    libgl1-mesa-glx \
-    nodejs \
-    npm && \
-    apt-get clean
-
-# Добавляем архитектуру i386 для поддержки 32-битных приложений
-RUN dpkg --add-architecture i386
-
-# Добавляем репозиторий WineHQ и устанавливаем публичный ключ
-RUN wget -nc https://dl.winehq.org/wine-builds/Release.key && \
-    apt-key add Release.key
-
-# Добавляем репозиторий WineHQ в список источников
-RUN sudo add-apt-repository "deb https://dl.winehq.org/wine-builds/ubuntu/ focal main" && \
-    apt-get update
-
-# Устанавливаем Wine
-RUN apt-get install -y --install-recommends winehq-stable && \
-    apt-get clean
-
-# Устанавливаем Node.js
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
-    apt-get install -y nodejs
-
-# Копируем package.json и устанавливаем зависимости
+# Копируем файлы package.json и package-lock.json (если есть)
 COPY package*.json ./
+
+# Устанавливаем зависимости проекта
 RUN npm install
 
-# Копируем все файлы из текущей директории в контейнер
+# Копируем весь исходный код проекта в контейнер
 COPY . .
 
-# Открываем порты (если нужно для взаимодействия с сервером)
-# EXPOSE 8080
+# (При необходимости) открываем порт, если приложение его использует
+# EXPOSE 3000
 
-# Устанавливаем переменные окружения для Wine
-ENV WINEPREFIX=/wineprefix
-ENV WINEARCH=win64
-
-# Команда для запуска приложения
-CMD ["node", "index.js"]
+# Запускаем приложение
+CMD [ "node", "index.js" ]
