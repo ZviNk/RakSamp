@@ -29,9 +29,13 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # Создание директории для логов
 RUN mkdir -p /home/crow/RakSamp/Arizona/logs
 
-# Инициализация Wine и отключение автозапуска explorer.exe (NoDesktop)
+# Инициализация Wine и отключение автоматического запуска explorer.exe (NoDesktop)
 RUN wineboot --init || true
 RUN wine reg add "HKCU\\Software\\Wine\\Explorer" /v NoDesktop /t REG_SZ /d 1 /f || true
+
+# Устанавливаем переменные окружения для Wine
+ENV DISPLAY=:99
+ENV WINEDEBUG=-ole
 
 WORKDIR /usr/src/app
 
@@ -39,7 +43,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
 
-# Копирование оставшихся файлов приложения
+# Копирование остальных файлов приложения
 COPY . .
 
 # Запуск Xvfb в фоне (на дисплее :99) и затем Node.js приложения
