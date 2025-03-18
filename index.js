@@ -32,23 +32,23 @@ function startServer(server) {
     });
 
     // Запускаем Wine с переменной окружения DISPLAY
-    const process = spawn("wine", ["raksamp/arizona.exe", "-project", "1", "-server", server.server_id], {
+    const wine = spawn("wine", ["raksamp/arizona.exe", "-project", "1", "-server", server.server_id], {
         env: { ...process.env, DISPLAY: ":99" }
     });
 
-    process.stdout.on("data", (data) => {
+    wine.stdout.on("data", (data) => {
         console.log(`[STDOUT] ${data}`);
     });
 
-    process.stderr.on("data", (data) => {
+    wine.stderr.on("data", (data) => {
         console.error(`[STDERR] ${data}`);
     });
 
-    process.on("close", (code) => {
+    wine.on("close", (code) => {
         console.log(`[ RakSamp ] Server ${server.server_id} exited with code ${code}`);
     });
 
-    process.on("error", (err) => {
+    wine.on("error", (err) => {
         console.error("Failed to start process:", err);
     });
 }
