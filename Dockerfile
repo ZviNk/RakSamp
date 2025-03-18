@@ -36,6 +36,7 @@ RUN wineboot --init
 
 # Создадим рабочую директорию
 WORKDIR /usr/src/app
+RUN apt-get update && apt-get install -y dbus-x11
 
 # Устанавливаем зависимости
 COPY package*.json ./
