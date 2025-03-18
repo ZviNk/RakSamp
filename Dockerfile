@@ -39,10 +39,6 @@ RUN wineboot --init
 
 # Создаём рабочую директорию и устанавливаем пакет dbus-x11
 WORKDIR /usr/src/app
-RUN apt-get update && \
-    apt-get install -y dbus-x11 && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
 
 # Копируем файлы зависимостей и устанавливаем node-модули
 COPY package*.json ./
