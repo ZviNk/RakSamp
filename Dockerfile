@@ -1,27 +1,33 @@
-FROM node:22.9.0-slim
+# Используем официальный образ Node.js (например, Node 14)
+FROM node:14
 
-RUN apt-get update && apt-get install -y tzdata
+# Добавляем архитектуру i386, обновляем пакеты и устанавливаем wine, wine32, xvfb и wget
 RUN dpkg --add-architecture i386 && \
     apt-get update && \
-    apt-get install -y wine32 && \
-    apt-get clean && \
+    apt-get install -y wine wine32 xvfb wget && \
     rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /home/crow/RakSamp/Arizona/logs
-RUN wine cmd.exe /c echo Z: > Z.bat
-RUN echo "/home/crow/RakSamp/Arizona" >> Z.bat
-RUN wine regedit Z.bat
-RUN rm Z.bat
+# Скачиваем winetricks и делаем его исполняемым
+RUN wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks -O /usr/local/bin/winetricks && \
+    chmod +x /usr/local/bin/winetricks
 
-ENV TZ=Europe/Moscow
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+# Устанавливаем wine-gecko через winetricks в неинтерактивном режиме
+RUN winetricks --unattended gecko
 
+# Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /usr/src/app
 
+# Копируем файлы package.json и package-lock.json (если есть)
 COPY package*.json ./
 
+# Устанавливаем зависимости проекта
 RUN npm install
 
+# Копируем весь исходный код проекта в контейнер
 COPY . .
 
+# (При необходимости) открываем порт, если приложение его использует
+# EXPOSE 3000
+
+# Запускаем приложение
 CMD [ "node", "index.js" ]

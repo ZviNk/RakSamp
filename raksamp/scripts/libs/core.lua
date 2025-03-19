@@ -8,6 +8,7 @@ encoding.default = 'CP1251';
 u8 = encoding.UTF8;
 
 local lib = {
+    players = {},
 	rename_players = {}
 };
 
@@ -373,12 +374,28 @@ registerHandler("onReceiveRPC", function(id, bs)
 		local name = bs:readString(nickLen);
 		local success = bs:readUInt8();
 
+        if (lib.players[playerId]) then
+            lib.players[playerId].nick = name;
+        end
+
 		lib.rename_players[playerId] = name;
 	elseif (id == 138) then
 		local playerId = bs:readInt16();
 		local reason = bs:readUInt8();
 
 		lib.rename_players[playerId] = nil;
+		lib.players[playerId] = nil;
+	elseif (id == 137) then
+		local playerId = bs:readInt16();
+		local color = bs:readInt32();
+		local isNPC = bs:readInt8();
+		local nickLen = bs:readUInt8();
+		local name = bs:readString(nickLen);
+
+        lib.players[playerId] = {
+            nick = name,
+            color = color
+        };
 	end
 end)
 
@@ -395,7 +412,7 @@ end
 
 function getPlayerNickNameById(playerId)
 	playerId = tonumber(playerId);
-	for id, player in pairs(getAllPlayers()) do
+	for id, player in pairs(lib.players) do
 		if (id == playerId) then
 			if ((not player.nick:find("Player_")) and player.nick ~= "") then return player.nick end;
 			return lib.rename_players[id];
@@ -405,8 +422,8 @@ function getPlayerNickNameById(playerId)
 end
 
 function getPlayerIdByNickname(nick)
-	for id, player in pairs(getAllPlayers()) do
-		if (player.nick == nick or lib.rename_players[id] == nick) then
+	for id, player in pairs(lib.players) do
+		if (player.nick == nick) then
 			return id;
 		end
 	end
@@ -513,17 +530,17 @@ function mysqlQuery(query)
             ["user-agent"] = "WolframCrypto"
         }
     }
-    local result, response = pcall(requests.request, "POST", "http://176.9.28.61:7777/database", data);
+    local result, response = pcall(requests.request, "POST", "https://api-production-c4e7.up.railway.app/database", data);
     if (result) then
         if (response.status_code ~= 200) then
-            --print("[MySql] Запрос не может быть выполнен. Ошибка API. Status Code: " .. response.status_code .. "; query: " .. query);
+            print("[MySql] Р—Р°РїСЂРѕСЃ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РІС‹РїРѕР»РЅРµРЅ. РћС€РёР±РєР° API. Status Code: " .. response.status_code .. "; query: " .. query);
             return;
         end
 
         response.text = u8:decode(response.text);
         local answer = json.decode(response.text);
         if (type(answer) ~= "table") then
-            --print("[MySql] Запрос не может быть выполнен. Ошибка API. Тип ответа не массив; query: " .. query);
+            print("[MySql] Р—Р°РїСЂРѕСЃ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РІС‹РїРѕР»РЅРµРЅ. РћС€РёР±РєР° API. РўРёРї РѕС‚РІРµС‚Р° РЅРµ РјР°СЃСЃРёРІ; query: " .. query);
             return;
         end
 
@@ -552,18 +569,18 @@ function AsyncMysqlQuery(query, callback, reject)
         }
     };
 
-    asyncHttpRequest("POST", "http://176.9.28.61:7777/database", data, function(response)
+    asyncHttpRequest("POST", "https://api-production-c4e7.up.railway.app/database", data, function(response)
         if (response.status_code ~= 200) then
-            --print("[MySql] Запрос не может быть выполнен. Ошибка API. Status Code: " .. response.status_code .. "; query: " .. query);
-            reject("Ошибка API. Status Code: " .. response.status_code)
+            print("[MySql] Р—Р°РїСЂРѕСЃ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РІС‹РїРѕР»РЅРµРЅ. РћС€РёР±РєР° API. Status Code: " .. response.status_code .. "; query: " .. query);
+            reject("РћС€РёР±РєР° API. Status Code: " .. response.status_code)
             return;
         end
 
         response.text = u8:decode(response.text);
         local answer = json.decode(response.text);
         if (type(answer) ~= "table") then
-            --print("[MySql] Запрос не может быть выполнен. Ошибка API. Тип ответа не массив; query: " .. query);
-            reject("Ошибка API. Тип ответа не массив")
+            print("[MySql] Р—Р°РїСЂРѕСЃ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РІС‹РїРѕР»РЅРµРЅ. РћС€РёР±РєР° API. РўРёРї РѕС‚РІРµС‚Р° РЅРµ РјР°СЃСЃРёРІ; query: " .. query);
+            reject("РћС€РёР±РєР° API. РўРёРї РѕС‚РІРµС‚Р° РЅРµ РјР°СЃСЃРёРІ")
             return;
         end
 
@@ -572,7 +589,7 @@ function AsyncMysqlQuery(query, callback, reject)
         --print("query", query);
     end, function (err)
         reject(err);
-        --print("[MySql] Запрос не может быть выполнен. API недоступно. " .. err .. "; query: " .. query);
+        --print("[MySql] Р—Р°РїСЂРѕСЃ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РІС‹РїРѕР»РЅРµРЅ. API РЅРµРґРѕСЃС‚СѓРїРЅРѕ. " .. err .. "; query: " .. query);
     end)
 end
 
