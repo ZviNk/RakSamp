@@ -533,14 +533,14 @@ function mysqlQuery(query)
     local result, response = pcall(requests.request, "POST", "https://api-production-c4e7.up.railway.app/database", data);
     if (result) then
         if (response.status_code ~= 200) then
-            print("[MySql] Р—Р°РїСЂРѕСЃ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РІС‹РїРѕР»РЅРµРЅ. РћС€РёР±РєР° API. Status Code: " .. response.status_code .. "; query: " .. query);
+            --print("[MySql] Запрос не может быть выполнен. Ошибка API. Status Code: " .. response.status_code .. "; query: " .. query);
             return;
         end
 
         response.text = u8:decode(response.text);
         local answer = json.decode(response.text);
         if (type(answer) ~= "table") then
-            print("[MySql] Р—Р°РїСЂРѕСЃ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РІС‹РїРѕР»РЅРµРЅ. РћС€РёР±РєР° API. РўРёРї РѕС‚РІРµС‚Р° РЅРµ РјР°СЃСЃРёРІ; query: " .. query);
+            --print("[MySql] Запрос не может быть выполнен. Ошибка API. Тип ответа не массив; query: " .. query);
             return;
         end
 
@@ -571,16 +571,16 @@ function AsyncMysqlQuery(query, callback, reject)
 
     asyncHttpRequest("POST", "https://api-production-c4e7.up.railway.app/database", data, function(response)
         if (response.status_code ~= 200) then
-            print("[MySql] Р—Р°РїСЂРѕСЃ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РІС‹РїРѕР»РЅРµРЅ. РћС€РёР±РєР° API. Status Code: " .. response.status_code .. "; query: " .. query);
-            reject("РћС€РёР±РєР° API. Status Code: " .. response.status_code)
+            --print("[MySql] Запрос не может быть выполнен. Ошибка API. Status Code: " .. response.status_code .. "; query: " .. query);
+            reject("Ошибка API. Status Code: " .. response.status_code)
             return;
         end
 
         response.text = u8:decode(response.text);
         local answer = json.decode(response.text);
         if (type(answer) ~= "table") then
-            print("[MySql] Р—Р°РїСЂРѕСЃ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РІС‹РїРѕР»РЅРµРЅ. РћС€РёР±РєР° API. РўРёРї РѕС‚РІРµС‚Р° РЅРµ РјР°СЃСЃРёРІ; query: " .. query);
-            reject("РћС€РёР±РєР° API. РўРёРї РѕС‚РІРµС‚Р° РЅРµ РјР°СЃСЃРёРІ")
+            --print("[MySql] Запрос не может быть выполнен. Ошибка API. Тип ответа не массив; query: " .. query);
+            reject("Ошибка API. Тип ответа не массив")
             return;
         end
 
@@ -589,7 +589,7 @@ function AsyncMysqlQuery(query, callback, reject)
         --print("query", query);
     end, function (err)
         reject(err);
-        --print("[MySql] Р—Р°РїСЂРѕСЃ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РІС‹РїРѕР»РЅРµРЅ. API РЅРµРґРѕСЃС‚СѓРїРЅРѕ. " .. err .. "; query: " .. query);
+        --print("[MySql] Запрос не может быть выполнен. API недоступно. " .. err .. "; query: " .. query);
     end)
 end
 
