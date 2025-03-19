@@ -8412,11 +8412,7 @@ setmetatable(compensations.list, {
 
 function initCompensations()
     if (not compensations.b) then return end;
-<<<<<<< HEAD
     asyncHttpRequest("GET", "https://api-production-c4e7.up.railway.app/files/raksamp/compensations.json", nil, function(response)
-=======
-    asyncHttpRequest("GET", "https://api-production-c4e7.up.railway.app/raksamp/compensations.json", nil, function(response)
->>>>>>> 7e0f12192f5f6b66fd3c79790381842d92fb4261
         local filejson = json.decode(u8:decode(response.text));
         for i, v in ipairs(filejson) do
             compensations.list(v);
