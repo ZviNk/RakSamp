@@ -1,33 +1,26 @@
-# Используем официальный образ Node.js (например, Node 14)
-FROM node:14
+FROM ubuntu:20.04
 
-# Добавляем архитектуру i386, обновляем пакеты и устанавливаем wine, wine32, xvfb и wget
-RUN dpkg --add-architecture i386 && \
+# Добавляем поддержку i386 и обновляем репозитории
+RUN dpkg --add-architecture i386 && apt-get update
+
+# Устанавливаем Wine, xvfb и необходимые пакеты
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y wine wine32 wget apt-transport-https software-properties-common xvfb
+
+# Устанавливаем PowerShell Core
+RUN wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb && \
+    dpkg -i packages-microsoft-prod.deb && \
     apt-get update && \
-    apt-get install -y wine wine32 xvfb wget && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y powershell
 
-# Скачиваем winetricks и делаем его исполняемым
-RUN wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks -O /usr/local/bin/winetricks && \
-    chmod +x /usr/local/bin/winetricks
+# Задаем рабочую директорию
+WORKDIR /app
 
-# Устанавливаем wine-gecko через winetricks в неинтерактивном режиме
-RUN winetricks --unattended gecko
+# Копируем необходимые файлы и каталоги в контейнер
+COPY raksamp/arizona.exe /app/
+COPY raksamp/lua51.dll /app/
+COPY run_bot.ps1 /app/
+COPY raksamp/scripts /app/scripts
+COPY raksamp/settings /app/settings
 
-# Устанавливаем рабочую директорию внутри контейнера
-WORKDIR /usr/src/app
-
-# Копируем файлы package.json и package-lock.json (если есть)
-COPY package*.json ./
-
-# Устанавливаем зависимости проекта
-RUN npm install
-
-# Копируем весь исходный код проекта в контейнер
-COPY . .
-
-# (При необходимости) открываем порт, если приложение его использует
-# EXPOSE 3000
-
-# Запускаем приложение
-CMD [ "node", "index.js" ]
+# Запускаем PowerShell-скрипт с обходом политики выполнения
+CMD ["pwsh", "-ExecutionPolicy", "Bypass", "-File", "/app/run_bot.ps1"]
