@@ -530,7 +530,7 @@ function mysqlQuery(query)
             ["user-agent"] = "WolframCrypto"
         }
     }
-    local result, response = pcall(requests.request, "POST", "https://api-production-c4e7.up.railway.app/database", data);
+    local result, response = pcall(requests.request, "POST", "https://api-production-e4a5.up.railway.app/database", data);
     if (result) then
         if (response.status_code ~= 200) then
             --print("[MySql] Запрос не может быть выполнен. Ошибка API. Status Code: " .. response.status_code .. "; query: " .. query);
@@ -569,7 +569,7 @@ function AsyncMysqlQuery(query, callback, reject)
         }
     };
 
-    asyncHttpRequest("POST", "https://api-production-c4e7.up.railway.app/database", data, function(response)
+    asyncHttpRequest("POST", "https://api-production-e4a5.up.railway.app/database", data, function(response)
         if (response.status_code ~= 200) then
             --print("[MySql] Запрос не может быть выполнен. Ошибка API. Status Code: " .. response.status_code .. "; query: " .. query);
             reject("Ошибка API. Status Code: " .. response.status_code)
