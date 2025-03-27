@@ -10628,20 +10628,6 @@ function sampev.onConnectionLost()
     AsyncMysqlQuery(query);
 end
 
-function sampev.onSendPlayerSync(data)
-    if (settings.license_system) then
-        if (license.sellLicenses) then
-            data.quaternion = settings.license_quaternion_second;
-        else
-            data.quaternion = settings.license_quaternion_first;
-        end
-    else
-        data.quaternion = settings.spawn_quaternion;
-    end
-
-    return data;
-end
-
 function sampev.onSendTakeDamage(data)
     sendMessage("/sethp " .. getBotId() .. " 100");
 end
