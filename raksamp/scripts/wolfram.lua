@@ -9696,7 +9696,7 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
         end
     end
 
-    if (dialogId == 27230) then
+    if (dialogId == 27231) then
         local build = text:match("Build: (.+)");
 
         if (build) then
@@ -10729,7 +10729,7 @@ function sampev.onCreateGangZone(zoneId, squareStart, squareEnd, color)
 end
 
 function sampev.onShowTextDraw(textdrawId, textdraw)
-    if (textdrawId == 1385) then
+    if (textdrawId == 1332) then
         if (textdraw.text:find("ticks:%s*(%d+)%s*/%s*min:%s*(%d+)%s*/%s*avg:%s*(%d+)%s*/%s*max:%s*(%d+)")) then
             local ticks, min, avg, max = textdraw.text:match("ticks:%s*(%d+)%s*/%s*min:%s*(%d+)%s*/%s*avg:%s*(%d+)%s*/%s*max:%s*(%d+)");
 
