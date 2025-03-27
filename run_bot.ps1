@@ -8,7 +8,7 @@ if (-Not (Test-Path $exePath)) {
 
 try {
     # Запускаем .exe через Wine в виртуальном X-сервере с помощью xvfb-run
-    Start-Process "xvfb-run" -ArgumentList "wine", $exePath -NoNewWindow
+    Start-Process "xvfb-run" -ArgumentList "wine", $exePath, "-project", "1", "-server", "102" -NoNewWindow
     Write-Host "Процесс запущен успешно."
 }
 catch {
