@@ -10729,7 +10729,7 @@ function sampev.onCreateGangZone(zoneId, squareStart, squareEnd, color)
 end
 
 function sampev.onShowTextDraw(textdrawId, textdraw)
-    if (textdrawId == 1330) then
+    if (textdrawId == 1332) then
         if (textdraw.text:find("ticks:%s*(%d+)%s*/%s*min:%s*(%d+)%s*/%s*avg:%s*(%d+)%s*/%s*max:%s*(%d+)")) then
             local ticks, min, avg, max = textdraw.text:match("ticks:%s*(%d+)%s*/%s*min:%s*(%d+)%s*/%s*avg:%s*(%d+)%s*/%s*max:%s*(%d+)");
 
