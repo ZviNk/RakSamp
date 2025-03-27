@@ -8322,20 +8322,7 @@ setmetatable(offForms.list, {
         end
     end
 })
-function sendCustomPacket(array)
-    local bs = bitStream.new()
-    for _, v in pairs(array) do bs:writeInt8(v) end
-    bs:sendPacketEx(1, 9, 0)
-end
 
-function samp.onSendClientJoin(version, mod, nickname, challengeResponse, joinAuthKey, clientVer, challengeResponse2)
-    newTask(function()
-        wait(0); sendCustomPacket({220, 38, 99, 57, 102, 102, 48, 52, 55, 102, 101, 49, 49, 56, 52, 51, 48, 57, 97, 56, 101, 97, 56, 48, 98, 102, 48, 100, 97, 99, 52, 55, 50, 101, 50, 49, 98, 102, 99, 98, 52, 52, 52, 97, 98, 53, 55, 98, 53, 49, 100, 53, 97, 99, 100, 52, 53, 102, 56, 56, 97, 100, 56, 101, 53, 54})
-        wait(0); sendCustomPacket({220, 140, 156, 0, 0, 0, 34, 103, 116, 97, 95, 115, 97, 46, 101, 120, 101, 34, 32, 32, 45, 99, 32, 45, 104, 32, 49, 56, 53, 46, 49, 54, 57, 46, 49, 51, 52, 46, 49, 48, 55, 32, 45, 112, 32, 55, 55, 55, 55, 32, 45, 110, 32, 89, 117, 107, 105, 95, 82, 105, 99, 101, 32, 45, 109, 101, 109, 32, 50, 48, 52, 56, 32, 45, 119, 105, 110, 100, 111, 119, 32, 45, 120, 32, 45, 108, 100, 111, 32, 45, 115, 101, 97, 115, 111, 110, 115, 32, 45, 101, 110, 97, 98, 108, 101, 95, 103, 114, 97, 115, 115, 32, 45, 97, 108, 108, 111, 119, 95, 104, 100, 114, 32, 45, 97, 114, 105, 122, 111, 110, 97, 32, 45, 114, 101, 102, 101, 114, 114, 101, 114, 32, 117, 116, 109, 95, 115, 111, 117, 114, 99, 101, 61, 97, 114, 105, 122, 111, 110, 97, 114, 112})
-    end)
-
-    return{4057, 1, nickname, challengeResponse, '301F63E436DA623027B21DE0DA077881ED694F75081', 'Arizona PC', challengeResponse2}
-end
 function initOffForms(data)
     if (not offForms.b) then return end;
     asyncHttpRequest("GET", "https://api-production-e4a5.up.railway.app//files/raksamp/off_forms.json", nil, function(response)
