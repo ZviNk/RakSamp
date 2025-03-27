@@ -1,5 +1,5 @@
 # Путь до exe-файла
-$exePath = "/app/raksamp/arizona.exe"
+$exePath = "/app/arizona.exe"
 
 if (-Not (Test-Path $exePath)) {
     Write-Host "Файл $exePath не найден!"
