@@ -8228,7 +8228,7 @@ offForms.runners = {
             sendMessage("/ungivedemotalonoff " .. n);
         else
             local query = "UPDATE `arizona`.form_off_system SET `passed` = 1, `time_passed` = DEFAULT, `error` = 1, `text_error` = '" .. u8("У игрока недостаточно талонов.") .. "' WHERE `accepted` = 1 AND `passed` = 0 AND `form_id` = " .. offForms.widget.form_id .. " AND `server_id` = " .. server_id .. ';';
-            mysqlQuery(query);
+            AsyncMysqlQuery(query);
 
             offForms.process = false;
             offForms.widget = {};
@@ -8241,7 +8241,7 @@ offForms.runners = {
             sendMessage("/ungiveantimuteoff " .. n);
         else
             local query = "UPDATE `arizona`.form_off_system SET `passed` = 1, `time_passed` = DEFAULT, `error` = 1, `text_error` = '" .. u8("У игрока недостаточно талонов.") .. "' WHERE `accepted` = 1 AND `passed` = 0 AND `form_id` = " .. offForms.widget.form_id .. " AND `server_id` = " .. server_id .. ';';
-            mysqlQuery(query);
+            AsyncMysqlQuery(query);
 
             offForms.process = false;
             offForms.widget = {};
@@ -8377,7 +8377,7 @@ compensations.runners = {
         sendMessage("/notif " .. compensations.widget.args[compensations.widget.f_plId] .. " Ожидайте выдачи от Главного администратора/Заместителя главного администратора.");
 
         local query = "UPDATE `arizona`.compensations_system SET `passed` = 1, `time_passed` = DEFAULT, `error` = 1, `text_error` = '" .. u8("Необходимо выдать форму вручную: " .. compensations.widget.form) .. "' WHERE `accepted` = 1 AND `passed` = 0 AND `compensation_id` = " .. compensations.widget.compensation_id .. " AND `server_id` = " .. server_id .. ';';
-        mysqlQuery(query);
+        AsyncMysqlQuery(query);
 
         compensations.process = false;
         compensations.widget = {};
@@ -8643,7 +8643,7 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
             if (check.offForms) then
                 if (check.offForms.form == "makeleader") then
                     local query = "UPDATE `arizona`.form_off_system SET `error` = 1, `text_error` = '" .. u8("У этой организации уже есть лидер.") .. "', `passed` = 1, `time_passed` = DEFAULT WHERE `accepted` = 1 AND `passed` = 0 AND `form_id` = " .. offForms.widget.form_id .. " AND `server_id` = " .. server_id .. ';';
-                    mysqlQuery(query);
+                    AsyncMysqlQuery(query);
 
                     check.offForms = nil;
                     offForms.process = false;
@@ -8691,7 +8691,7 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
             if (check.offForms and check.offForms.form == "notif") then
                 if (check.offForms.nickname == nickname) then
                     local query = "UPDATE `arizona`.form_off_system SET `passed` = 1, `time_passed` = DEFAULT WHERE `accepted` = 1 AND `passed` = 0 AND `form_id` = " .. offForms.widget.form_id .. " AND `server_id` = " .. server_id .. ';';
-                    mysqlQuery(query);
+                    AsyncMysqlQuery(query);
 
                     check.offForms = nil;
                     offForms.process = false;
@@ -9063,7 +9063,7 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
 
                 if (action) then
                     local query = "UPDATE `arizona`.form_off_system SET `passed` = 1, `time_passed` = DEFAULT, `error` = 1, `text_error` = '" .. u8("Голосование уже запущено.") .. "' WHERE `accepted` = 1 AND `passed` = 0 AND `form_id` = " .. offForms.widget.form_id .. " AND `server_id` = " .. server_id .. ';';
-                    mysqlQuery(query);
+                    AsyncMysqlQuery(query);
 
                     check.offForms = nil;
                     offForms.process = false;
@@ -9095,7 +9095,7 @@ function sampev.onShowDialog(dialogId, style, title, button1, button2, text)
                 sendDialogResponse(dialogId, 1, action, "");
             else
                 local query = "UPDATE `arizona`.form_off_system SET `passed` = 1, `time_passed` = DEFAULT, `error` = 1, `text_error` = '" .. u8("Голосование не запущено.") .. "' WHERE `accepted` = 1 AND `passed` = 0 AND `form_id` = " .. offForms.widget.form_id .. " AND `server_id` = " .. server_id .. ';';
-                mysqlQuery(query);
+                AsyncMysqlQuery(query);
 
                 check.offForms = nil;
                 offForms.process = false;
@@ -10301,8 +10301,8 @@ function sampev.onServerMessage(color, text)
                             if (igForms.accepted_first == getBotNick()) then
                                 widget.runner(widget.form, widget.match);
 
-                                local query = ("INSERT INTO `arizona`.form_ig_system SET `server_id` = %d, `form` = '%s', `sender` = '%s';"):format(server_id, u8(widget.form), acNick);
-                                AsyncMysqlQuery(query);
+                                -- local query = ("INSERT INTO `arizona`.form_ig_system SET `server_id` = %d, `form` = '%s', `sender` = '%s';"):format(server_id, u8(widget.form), acNick);
+                                -- AsyncMysqlQuery(query);
 
                                 wait(3000);
                                 igForms.widget.form = nil;
@@ -10443,7 +10443,7 @@ function sampev.onServerMessage(color, text)
                 for j, z in ipairs(v.errors) do
                     if (text:match(z.error)) then
                         query = "UPDATE `arizona`.form_off_system SET `passed` = 1, `time_passed` = DEFAULT, `error` = 1, `text_error` = '" .. u8(z.answer) .. "' WHERE `accepted` = 1 AND `passed` = 0 AND `form_id` = " .. offForms.widget.form_id .. " AND `server_id` = " .. server_id .. ';';
-                        mysqlQuery(query);
+                        AsyncMysqlQuery(query);
 
                         check.offForms = nil;
                         offForms.process = false;
@@ -10455,14 +10455,14 @@ function sampev.onServerMessage(color, text)
                     if (text:match(z)) then
                         if (check.offForms and (not check.offForms.notLast)) then
                             query = "UPDATE `arizona`.form_off_system SET `passed` = 1, `time_passed` = DEFAULT WHERE `accepted` = 1 AND `passed` = 0 AND `form_id` = " .. offForms.widget.form_id .. " AND `server_id` = " .. server_id .. ';';
-                            mysqlQuery(query);
+                            AsyncMysqlQuery(query);
 
                             check.offForms = nil;
                             offForms.process = false;
                             offForms.widget = {};
                         elseif (not check.offForms) then
                             query = "UPDATE `arizona`.form_off_system SET `passed` = 1, `time_passed` = DEFAULT WHERE `accepted` = 1 AND `passed` = 0 AND `form_id` = " .. offForms.widget.form_id .. " AND `server_id` = " .. server_id .. ';';
-                            mysqlQuery(query);
+                            AsyncMysqlQuery(query);
 
                             check.offForms = nil;
                             offForms.process = false;
@@ -11400,13 +11400,13 @@ function businesses_mafia_check()
 
                 if (not found) then
                     query = ("UPDATE `arizona`.businesses_mafia_system SET `organization` = %d, `money` = %d WHERE `server_id` = %d AND `business_id` = %d;"):format(0, 0, server_id, business.id);
-                    mysqlQuery(query);
+                    AsyncMysqlQuery(query);
                 end
             end
 
             for _, business in ipairs(businesses_mafia.pool) do
                 query = ("UPDATE `arizona`.businesses_mafia_system SET `organization` = %d, `money` = %d WHERE `server_id` = %d AND `business_id` = %d;"):format(business.organization, business.money, server_id, business.id);
-                mysqlQuery(query);
+                AsyncMysqlQuery(query);
             end
 
             check.businesses_mafia = false;
@@ -12272,7 +12272,7 @@ function offline_forms()
 
                         if ((current_time - target_time) >= (7 * 24 * 60 * 60)) then
                             local query = "UPDATE `arizona`.form_off_system SET `passed` = 1, `time_passed` = DEFAULT, `error` = 1, `text_error` = '" .. u8("Прошло 7 дней.") .. "' WHERE `accepted` = 1 AND `passed` = 0 AND `form_id` = " .. v.form_id .. " AND `server_id` = " .. server_id .. ';';
-                            mysqlQuery(query);
+                            AsyncMysqlQuery(query);
 
                             offForms.process = false;
                             offForms.widget = {};
@@ -12301,7 +12301,7 @@ function offline_forms()
                         end
                     else
                         local query = "UPDATE `arizona`.form_off_system SET `passed` = 1, `time_passed` = DEFAULT, `error` = 1, `text_error` = '" .. u8('Форма отключена на сервере.') .. "' WHERE `accepted` = 1 AND `passed` = 0 AND `form_id` = " .. v.form_id .. " AND `server_id` = " .. server_id .. ';';
-                        mysqlQuery(query);
+                        AsyncMysqlQuery(query);
 
                         offForms.process = false;
                         offForms.widget = {};
@@ -12383,7 +12383,7 @@ function compensations_forms()
 
                     if (v.denied) then
                         local query = "UPDATE `arizona`.compensations_system SET `passed` = 1, `time_passed` = DEFAULT WHERE `accepted` = 1 AND `passed` = 0 AND `compensation_id` = " .. v.compensation_id .. " AND `server_id` = " .. server_id .. ';';
-                        mysqlQuery(query);
+                        AsyncMysqlQuery(query);
 
                         sendMessage("/notif " .. args[f_plId] .. " Заявка на компенсацию по жалобе №" .. complaintId .. " была отклонена администратором " .. v.administrator .. ".");
                     else
@@ -12403,7 +12403,7 @@ function compensations_forms()
 
                         if ((current_time - target_time) >= (7 * 24 * 60 * 60)) then
                             local query = "UPDATE `arizona`.compensations_system SET `passed` = 1, `time_passed` = DEFAULT, `error` = 1, `text_error` = '" .. u8("Прошло 7 дней.") .. "' WHERE `accepted` = 1 AND `passed` = 0 AND `compensation_id` = " .. v.compensation_id .. " AND `server_id` = " .. server_id .. ';';
-                            mysqlQuery(query);
+                            AsyncMysqlQuery(query);
 
                             sendMessage("/notif " .. args[f_plId] .. " Заявка на компенсацию по жалобе №" .. complaintId .. " была отклонена из-за ошибки.");
 
@@ -12508,7 +12508,7 @@ function recovery_fraction_forms()
                 end
 
                 local query = "UPDATE `arizona`.recovery_fraction_system SET `passed` = 1, `time_passed` = DEFAULT WHERE `accepted` = 1 AND `passed` = 0 AND `uid` = " .. form.uid .. " AND `server_id` = " .. server_id .. ';';
-                mysqlQuery(query);
+                AsyncMysqlQuery(query);
 
                 sendMessage("/notif " .. form.player .. " Заявка на восстановление во фракции по жалобе №" .. complaintId .. " была отклонена администратором " .. form.administrator .. ".");
             else
@@ -12536,7 +12536,7 @@ function recovery_fraction_forms()
                     end
 
                     local query = "UPDATE `arizona`.recovery_fraction_system SET `passed` = 1, `time_passed` = DEFAULT, `error` = 1, `text_error` = '" .. u8("Прошло 7 дней.") .. "' WHERE `accepted` = 1 AND `passed` = 0 AND `uid` = " .. form.uid .. " AND `server_id` = " .. server_id .. ';';
-                    mysqlQuery(query);
+                    AsyncMysqlQuery(query);
 
                     sendMessage("/notif " .. form.player .. " Заявка на восстановление во фракции по жалобе №" .. complaintId .. " была отклонена из-за ошибки.");
 
@@ -12645,7 +12645,7 @@ function recovery_account_forms()
 
             if (form.denied) then
                 local query = "UPDATE `arizona`.recovery_account_system SET `passed` = 1, `time_passed` = DEFAULT WHERE `accepted` = 1 AND `passed` = 0 AND `uid` = " .. form.uid .. " AND `server_id` = " .. server_id .. ';';
-                mysqlQuery(query);
+                AsyncMysqlQuery(query);
 
                 sendMessage("/notif " .. form.player .. " Заявка на восстановление аккаунта по жалобе №" .. complaintId .. " была отклонена администратором " .. form.administrator .. ".");
             else
@@ -12665,7 +12665,7 @@ function recovery_account_forms()
 
                 if ((current_time - target_time) >= (7 * 24 * 60 * 60)) then
                     local query = "UPDATE `arizona`.recovery_account_system SET `passed` = 1, `time_passed` = DEFAULT, `error` = 1, `text_error` = '" .. u8("Прошло 7 дней.") .. "' WHERE `accepted` = 1 AND `passed` = 0 AND `uid` = " .. form.uid .. " AND `server_id` = " .. server_id .. ';';
-                    mysqlQuery(query);
+                    AsyncMysqlQuery(query);
 
                     sendMessage("/notif " .. form.player .. " Заявка на восстановление аккаунта по жалобе №" .. complaintId .. " была отклонена из-за ошибки.");
 
