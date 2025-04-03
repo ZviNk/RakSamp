@@ -10398,15 +10398,18 @@ function sampev.onServerMessage(color, text)
                 server_stats.admins.list[admin].afk = afk;
                 server_stats.admins.list[admin].re = recon;
 				query = ("SELECT * FROM `arizona`.admins WHERE `nick` = '%s';"):format(nick);
+				-- print(query)
 				local data = mysqlQuery(query);
-
+				
 				if (not data[1]) then
 					query = ("INSERT INTO `arizona`.admins SET `nick` = '%s', `level` = %d, `reputation` = '%s';"):format(nick, alvl, reputation);
-					AsyncMysqlQuery(query);
-				else
-					query = ("UPDATE `arizona`.admins SET `level` = %d, `reputation` = '%s' WHERE `nick` = '%s';").format(alvl, reputation, nick);
+					-- print(query)
 					AsyncMysqlQuery(query);
 				end
+				
+				query = ("UPDATE `arizona`.admins SET `level` = %d, `reputation` = %d WHERE `nick` = '%s';"):format(alvl, reputation, nick);
+				-- print(query)
+				AsyncMysqlQuery(query);
             else
                 table.insert(server_stats.admins.list, {
                     nickname = nick,
