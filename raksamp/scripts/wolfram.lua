@@ -11290,16 +11290,16 @@ function server_stats_check()
             end
         end
 
-        check.server_stats = "leaders";
-        sendMessage("/leaders_tools");
-        wait(5000);
-        check.server_stats = "zams";
-        sendMessage("/zams_tools");
-        wait(1500);
-        check.server_stats = nil;
+        --check.server_stats = "leaders";
+        --sendMessage("/leaders_tools");
+        --wait(5000);
+        --check.server_stats = "zams";
+        --sendMessage("/zams_tools");
+        --wait(1500);
+        --check.server_stats = nil;
         sendMessage("/admins");
         sendMessage("/id " .. getBotId());
-        sendMessage("/famgzinfo_tools");
+        --sendMessage("/famgzinfo_tools");
         wait(1500);
 
         for i, v in ipairs(server_stats.admins.list) do
